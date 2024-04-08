@@ -1,7 +1,7 @@
 import os
 from dash import html, dcc
 
-directory = '/home/andre/Documentos/Documentos/MINHAS AULAS/FUNAPE/sistema/conteudos'
+directory = os.path.abspath('conteudos')
 
 def generate_items(name, path, level):
     if os.path.isdir(path):

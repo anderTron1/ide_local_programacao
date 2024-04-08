@@ -26,7 +26,9 @@ layout = html.Div([
                 dbc.Button('Salvar', id='save', color='success', style={'width': '90px'})
             ),
             dbc.Col(
+                dbc.Row([
                 html.A('Abrir Página HTML', id='open-html-link', href='/render', target='_blank')
+                ])
             )
         ], style={'display': 'flex', 'flex-direction': 'row', 
                   'justify-content': 'left', 'padding-left': '10px',

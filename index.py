@@ -1,16 +1,17 @@
 from dash import html, dcc
 from dash.dependencies import Input, State, Output, ALL
 import dash_bootstrap_components as dbc
+from dash_ace import DashAceEditor
 from dash.exceptions import PreventUpdate
 import os
 import json
 import re
 
-from flask import Flask, send_file, Response
-
+import flask
 from app import *
 import list_files
 import abas
+
 
 app.layout = dbc.Container([
     dcc.Store(id="tabs-html"),
@@ -35,7 +36,7 @@ def display(pathname):
         ]
         return layout
     elif pathname == '/render':
-        arq = '/home/andre/Documentos/Documentos/MINHAS AULAS/FUNAPE/sistema/conteudos/index.html'
+        arq = os.path.abspath('conteudos/index.html')
         return html.Iframe(sandbox='', srcDoc=read_html_file(arq), style={'background-color': 'white', 'width': '100vw', 'height': '100vh', 'margin-left': '-10px'})
 
 
@@ -71,9 +72,14 @@ def abas_(n_clicks, tabs, tabs_html_criated):
             
            new_tabs = dcc.Tab(label=name_file, children=[ 
                     dbc.Card([ 
-                        dcc.Textarea(id={'type': 'textarea', 'index': clicked_id['index']},
+                        DashAceEditor(id={'type': 'textarea', 'index': clicked_id['index']},
                                      value=read_html_file(clicked_id['index']), 
-                                     style={'width': '100%', 'height': '35vw'})
+                                     theme="github",
+                                     mode='html',
+                                     tabSize=2,
+                                     enableBasicAutocompletion=True,
+                                     enableLiveAutocompletion=True,
+                                     autocompleter="/autocompleter?prefix=")
                     ], body=True)
             ])
            tabs.append(new_tabs)
@@ -83,19 +89,6 @@ def abas_(n_clicks, tabs, tabs_html_criated):
         else:
             raise PreventUpdate 
     raise PreventUpdate
-
-# @app.callback(
-#     Output({'type': 'textarea', 'index': ALL}, 'value'),
-#     [Input({'type': 'textarea', 'index': ALL}, 'value')]
-# )
-# def update_output(values):
-#     updated_values = []
-#     for value in values:
-#         updated_value = re.sub(r'<([^<>]*)>', lambda match: f'<span style="color: red;">{match.group(0)}</span>', value)
-#         updated_values.append(updated_value)
-#     return updated_values
-
-    #return updated_values
 
 @app.callback(
     Output('teste', 'children'),
@@ -118,10 +111,6 @@ def save_textarea(btn_save, textareas_id, textarea_value):
                          
      
     raise PreventUpdate
-
-
-
-
 
 if __name__ == '__main__':
     app.run_server(debug=True, host='192.168.15.11')
