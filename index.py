@@ -113,6 +113,6 @@ def save_textarea(btn_save, textareas_id, textarea_value):
     raise PreventUpdate
 
 if __name__ == '__main__':
-    app.run_server(debug=True, host='192.168.15.11')
+    app.run_server(debug=True, host='localhost')
 
 
