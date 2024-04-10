@@ -1,7 +1,8 @@
 import os
 from dash import html, dcc
+from app import *
 
-directory = os.path.abspath('conteudos')
+directory = os.path.abspath(diretory)
 
 def generate_items(name, path, level):
     if os.path.isdir(path):
@@ -16,7 +17,7 @@ def generate_items(name, path, level):
     else:
         return html.Li(name, id={'type': 'item', 'index': path}, 
                        style={'cursor': 'pointer','list-style-type': 'none',
-                              'margin-bottom': '2px', 'color': 'white'})
+                              'margin-bottom': '2px'})
 
 def gererate_list_files(directory, level=0):
     directory_content = os.listdir(directory)
@@ -28,7 +29,7 @@ def gererate_list_files(directory, level=0):
         items.append(generate_items(item, full_path, level))
     return items 
 
-layout = html.Div(
+layout = html.Div(#id='directorys',
     gererate_list_files(directory),
     style={'width': '200px',  'height': '99vh',
            'float': 'left',

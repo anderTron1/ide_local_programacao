@@ -1,6 +1,8 @@
 import os
 from dash import html, dcc
 import dash_bootstrap_components as dbc
+from dash.dependencies import Input, State, Output
+from app import *
 
 tab_style = {
     'borderBottom': '1px solid #d6d6d6',
@@ -12,30 +14,88 @@ tab_selected_style = {
     'borderTop': '1px solid #d6d6d6',
     'borderBottom': '1px solid #d6d6d6',
     'backgroundColor': '#119DFF',
-    'color': 'white',
+    #'color': 'white',
     'padding': '6px',
     'line-height': '0.5em'
 }
 
+button_style = {
+    'margin': '5px',
+    'padding': '10px',
+    'width': '90px',
+    'borderRadius': '5px',
+    'backgroundColor': '#4CAF50',
+    'color': 'white',
+    'border': 'none',
+    'cursor': 'pointer'
+}
+
+a_style = {
+    'margin': '5px',
+    'padding': '10px',
+    'width': '120px',
+    'borderRadius': '5px',
+    'backgroundColor': '#8A2BE2',
+    'color': 'white',
+    'border': 'none',
+    'cursor': 'pointer',
+    'text-decoration': 'none'
+}
+
 layout = html.Div([
     dbc.Row( 
-        dcc.Tabs(id='abas')   
+        dcc.Tabs(id='abas', parent_className='custom-tabs')   
     ),
     dbc.Row([
             dbc.Col(
-                dbc.Button('Salvar', id='save', color='success', style={'width': '90px'})
+                dbc.Button('Salvar', id='save', color='success', style=button_style)
             ),
             dbc.Col(
-                dbc.Row([
-                html.A('Abrir Página HTML', id='open-html-link', href='/render', target='_blank')
-                ])
-            )
-        ], style={'display': 'flex', 'flex-direction': 'row', 
-                  'justify-content': 'left', 'padding-left': '10px',
-                  'padding-top': '10px'}
-    ),
-    dbc.Row(html.Div(id='teste'))
+                html.A('Abrir Página HTML', id='open-html-link', href='/render', target='_blank', style=a_style)
+            ),
+            dbc.Col([
+                dcc.Interval(
+                    id='interval-open-msg', 
+                    interval=3000,  # Intervalo de 2 segundos
+                    n_intervals=0
+                ),
+                html.Div(id='msg-salvo',style={'display': 'none'}),
+            ])
+        ], style={'display': 'flex',
+                  'flex-direction': 'row',
+                  'justify-content': 'left',
+                  'padding-left': '10px',
+                  'align-items': 'center'}
+    ), 
+    dbc.Row(html.Div(id='teste')),
 ])
+
+@app.callback(
+    Output('msg-salvo', 'style'),
+    [Input('save', 'n_clicks'),
+     Input('interval-open-msg', 'n_intervals'),
+     #Input('interval-close-msg', 'n_intervals')
+     ],
+    prevent_initial_call=True
+)
+def display_message(btn_save, n_intervals):
+    ctx = dash.callback_context
+    if ctx.triggered_id == 'save':
+        return {'display': 'block',  'background-color':'rgba(255, 215, 0, 0.5)', 'padding': '5px'}  # Exibe a mensagem quando o botão é clicado
+
+    if n_intervals > 1:
+        return {'display': 'none'}  # Oculta a mensagem após 2 segundos
+                
+
+@app.callback(
+    Output('open-html-link', 'href'),
+    Input('abas', 'value'),
+    prevent_initial_call=True
+)
+def aba_selected(selected):
+    if selected is None:
+        raise PreventUpdate
+    return f'/render/{selected}'
                   
 
 """
