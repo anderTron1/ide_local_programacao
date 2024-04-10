@@ -9,7 +9,7 @@ import dash_dangerously_set_inner_html
 import os
 import json 
 import re 
-import base64
+#import base64
 
 import flask
 from flask_login import current_user
@@ -87,7 +87,7 @@ def display(pathname):
         if current_user.is_authenticated:
             layout = [
                 #list_files.layout,
-                dbc.Row(f'Nome do usuario: {current_user.username}'),
+                dbc.Row(f'Nome do usuário: {current_user.username}', style={"margin-bottom": '5px'}),
                 dbc.Row([
                     html.Div(#id='directorys',
                         list_files.gererate_list_files(diretory+'/'+current_user.username),
@@ -214,6 +214,6 @@ def save_textarea(btn_save, textareas_id, textarea_value):
 
 
 if __name__ == '__main__': 
-    app.run_server(debug=True, host='192.168.15.5')
+    app.run_server(debug=True, host='192.168.10.101')
 
 

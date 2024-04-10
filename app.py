@@ -21,8 +21,8 @@ import os
 from cryptography.fernet import Fernet
 from werkzeug.security import generate_password_hash
 
-diretory = 'conteudos/3a'
-path_db = 'data_3A.sqlite'
+diretory = 'conteudos/1c'
+path_db = 'data_1C.sqlite'
 
 key_crypt = Fernet.generate_key()
 cipher_suite = Fernet(key_crypt)
