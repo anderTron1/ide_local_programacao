@@ -2,6 +2,8 @@ import os
 from dash import html, dcc
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, State, Output
+#import directories 
+
 from app import *
 
 tab_style = {
@@ -53,6 +55,12 @@ layout = html.Div([
             dbc.Col(
                 html.A('Abrir Página HTML', id='open-html-link', href='/render', target='_blank', style=a_style)
             ),
+            # dbc.Col(
+            #     dbc.Button('Diretorios', id='crie-diretorios-arq', style=button_style)
+            # ),
+            dbc.Col(
+                html.A('Abrir Imagens', id='open-html-link-imagen', href='/imagens', target='_blank', style=a_style)
+            ),
             dbc.Col([
                 dcc.Interval(
                     id='interval-open-msg', 
@@ -85,7 +93,17 @@ def display_message(btn_save, n_intervals):
 
     if n_intervals > 1:
         return {'display': 'none'}  # Oculta a mensagem após 2 segundos
-                
+
+# Callback para abrir o modal
+# @app.callback(
+#     Output("modal-directory", "is_open"),
+#     [Input("crie-diretorios-arq", "n_clicks"), Input("close-modal", "n_clicks")],
+#     [State("modal-directory", "is_open")],
+# )
+# def toggle_modal(open_clicks, close_clicks, is_open):
+#     if open_clicks or close_clicks:
+#         return not is_open
+#     return is_open          
 
 @app.callback(
     Output('open-html-link', 'href'),
@@ -97,6 +115,8 @@ def aba_selected(selected):
         raise PreventUpdate
     return f'/render/{selected}'
                   
+
+
 
 """
 [

@@ -15,14 +15,36 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import sessionmaker
 from flask_login import LoginManager, UserMixin
 import sqlite3
+import socket
 
 import os
 
 from cryptography.fernet import Fernet
 from werkzeug.security import generate_password_hash
 
-diretory = 'conteudos/1c'
-path_db = 'data_1C.sqlite'
+def get_ipv4_address():
+    # Cria um socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    
+    try:
+        # Conecta-se a um servidor (neste caso, o Google DNS) para obter o endereço IP
+        s.connect(('8.8.8.8', 80))
+        
+        # Obtém o endereço IPv4 atribuído ao socket
+        ipv4_address = s.getsockname()[0]
+    except Exception as e:
+        #print("Ocorreu um erro ao obter o endereço IPv4:", e)
+        ipv4_address = None
+        pass
+    finally:
+        # Fecha o socket
+        s.close()
+    
+    return ipv4_address
+
+diretory = 'conteudos/3a'
+path_db = 'data_3A.sqlite'
+link_server_local = 'http://{get_ipv4_address()}:8000'
 
 key_crypt = Fernet.generate_key()
 cipher_suite = Fernet(key_crypt)
@@ -53,7 +75,7 @@ def init_app(app):
 estilos = ["https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css", dbc.themes.DARKLY]
 dbc_css = "https://kit.fontawesome.com/a076d05399.js" 
 
-app = dash.Dash(__name__)#,external_stylesheets=[dbc.themes.DARKLY])# external_stylesheets=[dbc.themes.DARKLY])#estilos)
+app = dash.Dash(__name__)#, external_scripts=['http://localhost:8000'])#,external_stylesheets=[dbc.themes.BOOTSTRAP])# external_stylesheets=[dbc.themes.DARKLY])#estilos)
 
 app.config['suppress_callback_exceptions'] = True
 app.scripts.config.serve_locally = True

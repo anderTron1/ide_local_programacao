@@ -19,20 +19,22 @@ import list_files
 import abas
 import login
 import register
+import list_image
+#import directories
 
 
 login_manager = LoginManager()
 login_manager.init_app(server)
 login_manager.login_view = '/login'
 
-app.layout = dbc.Container([
+app.layout = dbc.Container(id='container', children=[
     dcc.Store(id="tabs-html"),
+    dcc.Store(id="user-logado"),
     dcc.Location('url'),
     dcc.Store(id='rotas-url', data='/'),
     dcc.Store(id='register-state'),
     html.Div(id='content'),
 ], style={"margin": '5px'})
-
 
 def read_html_file(file_path):
     encodings = ['utf-8', 'latin1']
@@ -43,8 +45,9 @@ def read_html_file(file_path):
             return html_content
         except UnicodeDecodeError:
             pass
-
-
+def login1():
+    return "alert('Você clicou no botão de login!');"
+    
 @app.callback(
     Output('url', 'pathname'),
     Input('rotas-url', 'data'),
@@ -64,12 +67,15 @@ def iniciar(rotas):
             return '/register'   
    return '/'
 
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return session.query(Users).get(int(user_id))
 
 @app.callback(
     Output('content', 'children'),
+    Output('user-logado', 'data'),
     Input('url', 'pathname'),
     #State('directory', 'data'),
     #[State('tab-selected', 'data')]
@@ -82,56 +88,67 @@ def display(pathname):
             #abas.layout
             login.layout
         ]
-        return layout
+        return layout, ""
     if pathname == '/ide':
+        user = ""
         if current_user.is_authenticated:
+            user = current_user.username
             layout = [
                 #list_files.layout,
-                dbc.Row(f'Nome do usuário: {current_user.username}', style={"margin-bottom": '5px'}),
+                dbc.Row([
+                    html.Label(f'Nome do usuário: {current_user.username}')
+                ], style={"margin-bottom": '5px'}),
                 dbc.Row([
                     html.Div(#id='directorys',
-                        list_files.gererate_list_files(diretory+'/'+current_user.username),
-                        style={'width': '200px',  'height': '99vh',
+                        list_files.gererate_list_files(diretory+'/'+user),
+                        style={'width': '120px',  'height': '89vh',
                                 'float': 'left',
                                 'margin': '0', 'border': '2px solid #000',
-                                'padding': '5px'}
+                                'padding': '5px -10px 5px 5px'}
                     ),
                     abas.layout
-                ])
+                ]),
+                
+                #directories.modal
             ]
         else:
             layout = [login.layout]
-        return layout
+        return layout, user
     if pathname == '/register':
         if current_user.is_authenticated and current_user.username == 'admin':
-            return register.render_layout("")
+            return register.render_layout(""), ""
         else:
-            return [login.layout]
+            return [login.layout], ""
     
     if pathname.startswith('/render/'):
         if current_user.is_authenticated:
+            user = current_user.username
             file = f"{pathname.split('/')[-1]}.html"
-            for root, dirs, files in os.walk(diretory):
+            for root, dirs, files in os.walk(diretory+"/"+user):
                 if file in files:
                     path = os.path.abspath(os.path.join(root, file))
             
             if os.path.exists(path):
                 arq = os.path.abspath(path)
-                return dash_dangerously_set_inner_html.DangerouslySetInnerHTML(children=read_html_file(arq))
-                # return html.Div(
-                #         #dcc.Markdown(read_html_file(arq))
-                #         dangerously_allow_html=True,
-                #         children=[read_html_file(arq)]
-                #     )
-                #return Iframe(srcDoc=read_html_file(arq), style={'background-color': 'white', 'width': '100vw', 'height': '100vh', 'margin-left': '-10px'})
-        else: #allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigatio
-            return [login.layout]
+                #return dash_dangerously_set_inner_html.DangerouslySetInnerHTML(children=read_html_file(arq))
+                return html.Div(html.Iframe(srcDoc=read_html_file(arq), style={"height": "99vh", "width": "99vw", 'margin': '-10px'})), user
             
+            return [login.layout], ""
+            
+    if pathname == '/imagens':
+        if current_user.is_authenticated:
+            user = current_user.username
+            return html.Div([
+                list_image.criar_grade_imagens(diretory+'/'+user+'/imagens')
+            ]), user
+        else:
+            return [login.layout], ""
+        
     return html.Div([
             dbc.Card([
                 html.B("Erro 404 Not Found", style={'font-size': '2em'}) 
             ])
-         ], style={'display': 'flex', 'justify-content': 'center'}) 
+         ], style={'display': 'flex', 'justify-content': 'center'}), ""
       
 @app.callback( 
     Output('tabs-html', 'data'),
@@ -162,24 +179,37 @@ def abas_(n_clicks, tabs, tabs_html_criated):
            
            html_content = read_html_file(clicked_id['index'])
             
-           if file_format in ('html', 'css'):
-               new_tabs = dcc.Tab(label=name_file, 
-                                  #id={'type': 'textarea', 'index': clicked_id['index']},
-                                  className='custom-tab',
-                                  selected_className='custom-tab--selected',
-                                  value=name_file,
-                                  children=[ 
-                        dbc.Card([ 
+           if file_format in ('html', 'css', 'js'):
+               new_tabs = dcc.Tab(
+                    label=name_file,
+                    className='custom-tab',
+                    selected_className='custom-tab--selected',
+                    value=name_file,
+                    children=[ 
+                        # dbc.Row(
+                        #     html.Button("X", 
+                        #                 id={'type': 'close-button-tab', 'index': clicked_id['index']},
+                        #                 style={'margin-top': '-20px', 
+                        #                        'borderRadius': '5px',
+                        #                        'backgroundColor': '#4CAF50',
+                        #                        'color': 'white',
+                        #                        'border': 'none',
+                        #                        'fontSize': '20px',
+                        #                        'cursor': 'pointer'}),
+                        #     style={'display': 'flex', 'justify-content': 'left'}
+                        # ),
+                        dbc.Row([ 
                             DashAceEditor(id={'type': 'textarea', 'index': clicked_id['index']},
                                          value=read_html_file(clicked_id['index']), 
                                          theme="monokai",
                                          mode='html',
                                          tabSize=2,
-                                         height='80vh',
+                                         height='75vh',
+                                         width='60wh',
                                          enableBasicAutocompletion=True,
                                          enableLiveAutocompletion=True,
                                          autocompleter="/autocompleter?prefix=")
-                        ], body=True)
+                        ])
                 ])
                tabs.append(new_tabs)
                tabs_html_criated.append(os.path.basename(clicked_id['index']))
@@ -214,6 +244,6 @@ def save_textarea(btn_save, textareas_id, textarea_value):
 
 
 if __name__ == '__main__': 
-    app.run_server(debug=True, host='192.168.10.101')
+    app.run_server(debug=True, host=get_ipv4_address())
 
 
