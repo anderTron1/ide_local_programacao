@@ -2,11 +2,15 @@ import os
 import dash
 from dash import html, dcc
 import dash_bootstrap_components as dbc
-from dash.dependencies import Input, State, Output
+from dash.dependencies import Input, State, Output, ALL
 from dash_bootstrap_components import Modal, ModalHeader, ModalBody, ModalFooter
 from app import *
-import asyncio
-import aiohttp
+
+import json
+import base64
+#import asyncio
+#import aiohttp
+import list_files
 
 def listar_pastas(diretorio):
     pastas = []
@@ -35,10 +39,6 @@ def listar_arquivos(diretorio):
     return lista_arquivos
 
 def criar_grade_imagens(diretorio):
-    #pastas = listar_pastas("http://localhost:8000/"+diretorio)
-    imagens = listar_arquivos(diretorio)
-    
-    
     return html.Div([       
             html.Nav(className="navbar", children=[
                 html.Div([
@@ -58,6 +58,39 @@ def criar_grade_imagens(diretorio):
         
         html.Div(id="output-dropdown-value", style={'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center'})
     ])
+
+def criar_grade_pdf(diretorio):
+    return dbc.Row([
+            html.Div(#id='directorys',
+                list_files.gererate_list_files_pdf(diretorio),
+                style={'width': '120px',  'height': '89vh',
+                        'float': 'left',
+                        'margin': '0', 'border': '2px solid #000',
+                        'padding': '5px -10px 5px 5px'}
+            ),
+            html.Div(id='output-pdfs')
+        ])
+
+@app.callback(
+    Output('output-pdfs', 'children'),
+    [Input({'type': 'item-pdf', 'index': ALL}, 'n_clicks')],
+    prevent_initial_call=True
+)
+def open_pdf(n_clicks):
+    ctx = dash.callback_context
+    
+    if not ctx.triggered:
+        raise PreventUpdate
+
+    clicked_id = json.loads(ctx.triggered[0]['prop_id'].rsplit('.', 1)[0])
+        
+    try:
+        with open(clicked_id['index'], "rb") as file:
+           pdf_content = base64.b64encode(file.read()).decode('utf-8')
+           return html.Iframe(src=f"data:application/pdf;base64,{pdf_content}", style={'width': '85vw', 'height': '96vh', 'border': 'none'})
+    except Exception as e:
+        return html.Div(f"Erro ao abrir o PDF: {str(e)}", style={'color': 'red'})
+    
 
 @app.callback(
     Output('output-dropdown-value', 'children'),

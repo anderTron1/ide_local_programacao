@@ -14,7 +14,8 @@ div_center_style = {
     'flexDirection': 'column',
     'alignItems': 'center',
     'justifyContent': 'center',
-    'height': '100vh'  # Faz o conteúdo ocupar toda a altura da tela
+    'height': '100vh',  # Faz o conteúdo ocupar toda a altura da tela
+    'margin': '-12px'
 }
 
 input_style = {
@@ -41,7 +42,7 @@ error_style = {
     'color': 'red'
 }
 
-layout = html.Div(style=div_center_style, children=[
+layout = html.Div(className='login', style=div_center_style, children=[
     html.H2('Tela de Login'),
     dcc.Input(id='username-input', type='text', placeholder='Usuário', style=input_style),
     dcc.Input(id='password-input', type='password', placeholder='Senha', style=input_style),
@@ -50,8 +51,21 @@ layout = html.Div(style=div_center_style, children=[
 ])
 
 @app.callback(
-    Output('login-status', 'children'),
     Output('rotas-url', 'data'),
+    Output('login-status', 'children'),
+    Input('store-login-status', 'data'),
+    prevent_initial_call=True
+)
+def status_login(status):
+    if status == "error":
+        return  "", html.Div('Usuário ou senha incorretos.', style={'color': 'red'})
+    else:
+        return status, ""
+    
+    raise PreventUpdate
+
+@app.callback(
+    Output('store-login-status', 'data'),
     Input('login-button', 'n_clicks'),
     State('username-input', 'value'),
     State('password-input', 'value'),
@@ -77,11 +91,11 @@ def check_login(n_clicks, username, password):
                 #email = current_user.email
                 
                 if current_user.username == 'admin':
-                    return "", '/register'
+                    return '/register'
                 elif username == dir_path:
-                    return "", '/ide'
+                    return'/ide'
             else:
-                 return html.Div('Usuário ou senha incorretos.', style={'color': 'red'}), "/"
+                 return "error"
     raise PreventUpdate
 
 

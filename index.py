@@ -4,14 +4,14 @@ import dash_bootstrap_components as dbc
 from dash_ace import DashAceEditor
 from dash.exceptions import PreventUpdate
 #from dash_html_components import Iframe
-import dash_dangerously_set_inner_html
+#import dash_dangerously_set_inner_html
 
 import os
 import json 
-import re 
+#import re 
 #import base64
 
-import flask
+#import flask
 from flask_login import current_user
 
 from app import *
@@ -19,7 +19,7 @@ import list_files
 import abas
 import login
 import register
-import list_image
+import list_itens_to_tab
 #import directories
 
 
@@ -30,10 +30,11 @@ login_manager.login_view = '/login'
 app.layout = dbc.Container(id='container', children=[
     dcc.Store(id="tabs-html"),
     dcc.Store(id="user-logado"),
+    dcc.Store(id='store-login-status'),
     dcc.Location('url'),
     dcc.Store(id='rotas-url', data='/'),
     dcc.Store(id='register-state'),
-    html.Div(id='content'),
+    html.Div(id='content')
 ], style={"margin": '5px'})
 
 def read_html_file(file_path):
@@ -54,7 +55,7 @@ def login1():
     prevent_initial_call=True
 )
 def iniciar(rotas):
-   if rotas == None:
+   if rotas == None or rotas == "":
         raise PreventUpdate
     
    ctx = dash.callback_context
@@ -66,8 +67,6 @@ def iniciar(rotas):
         if rotas == '/register':
             return '/register'   
    return '/'
-
-
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -81,11 +80,9 @@ def load_user(user_id):
     #[State('tab-selected', 'data')]
 )
 def display(pathname):
-        
+    
     if pathname == '/' or pathname == '/login':
         layout = [
-            #list_files.layout,
-            #abas.layout
             login.layout
         ]
         return layout, ""
@@ -100,7 +97,7 @@ def display(pathname):
                 ], style={"margin-bottom": '5px'}),
                 dbc.Row([
                     html.Div(#id='directorys',
-                        list_files.gererate_list_files(diretory+'/'+user),
+                        list_files.gererate_list_files(diretory+'\\'+user),
                         style={'width': '120px',  'height': '89vh',
                                 'float': 'left',
                                 'margin': '0', 'border': '2px solid #000',
@@ -123,11 +120,14 @@ def display(pathname):
     if pathname.startswith('/render/'):
         if current_user.is_authenticated:
             user = current_user.username
-            file = f"{pathname.split('/')[-1]}.html"
-            for root, dirs, files in os.walk(diretory+"/"+user):
-                if file in files:
-                    path = os.path.abspath(os.path.join(root, file))
-            
+            #file = f"{pathname.split('/')[-1]}.html"
+            file = pathname.split('/render/')[1].strip()
+            path = file
+            #path = f"{diretory}/{user}/{file}.html"
+            #for root, dirs, files in os.walk(diretory+"/"+user):
+            #     if file in files:
+            #         path = os.path.abspath(os.path.join(root, file))
+            print(path)
             if os.path.exists(path):
                 arq = os.path.abspath(path)
                 #return dash_dangerously_set_inner_html.DangerouslySetInnerHTML(children=read_html_file(arq))
@@ -139,10 +139,17 @@ def display(pathname):
         if current_user.is_authenticated:
             user = current_user.username
             return html.Div([
-                list_image.criar_grade_imagens(diretory+'/'+user+'/imagens')
+                list_itens_to_tab.criar_grade_imagens(diretory+'/'+user+'/imagens')
             ]), user
         else:
             return [login.layout], ""
+    
+    if pathname == '/pdf':
+        if current_user.is_authenticated:
+            user = current_user.username
+            return html.Div([
+                list_itens_to_tab.criar_grade_pdf('conteudos/apoio')
+            ]), user
         
     return html.Div([
             dbc.Card([
@@ -163,6 +170,7 @@ def abas_(n_clicks, tabs, tabs_html_criated):
     
     if not ctx.triggered:
         raise PreventUpdate
+    print(ctx.triggered[0]['prop_id'])
     
     if 1 in n_clicks:#ctx.triggered:
         clicked_id = json.loads(ctx.triggered[0]['prop_id'].rsplit('.', 1)[0])
@@ -172,19 +180,21 @@ def abas_(n_clicks, tabs, tabs_html_criated):
             
         if tabs_html_criated is None:
             tabs_html_criated = []
+        
                      
-        if os.path.basename(clicked_id['index']) not in  tabs_html_criated:
+        #if os.path.basename(clicked_id['index']) not in  tabs_html_criated:
+        if clicked_id['index'] not in  tabs_html_criated:
            name_file = os.path.basename(clicked_id['index']).split('.')[0]
            file_format = os.path.basename(clicked_id['index']).split('.')[-1]
            
            html_content = read_html_file(clicked_id['index'])
-            
+           
            if file_format in ('html', 'css', 'js'):
                new_tabs = dcc.Tab(
                     label=name_file,
                     className='custom-tab',
                     selected_className='custom-tab--selected',
-                    value=name_file,
+                    value=clicked_id['index'],#name_file,
                     children=[ 
                         # dbc.Row(
                         #     html.Button("X", 
@@ -212,7 +222,7 @@ def abas_(n_clicks, tabs, tabs_html_criated):
                         ])
                 ])
                tabs.append(new_tabs)
-               tabs_html_criated.append(os.path.basename(clicked_id['index']))
+               tabs_html_criated.append(clicked_id['index'])#os.path.basename(clicked_id['index']))
                 
                return tabs_html_criated, tabs
            else:

@@ -61,6 +61,9 @@ layout = html.Div([
             dbc.Col(
                 html.A('Abrir Imagens', id='open-html-link-imagen', href='/imagens', target='_blank', style=a_style)
             ),
+            dbc.Col(
+                html.A('Materiais de Apoio', id='open-pdf', href='/pdf', target='_blank', style=a_style)
+            ),
             dbc.Col([
                 dcc.Interval(
                     id='interval-open-msg', 

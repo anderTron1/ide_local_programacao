@@ -10,7 +10,7 @@ import dash
 import dash_bootstrap_components as dbc
 
 from sqlalchemy import Table, create_engine
-from sqlalchemy.sql import select
+#from sqlalchemy.sql import select
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import sessionmaker
 from flask_login import LoginManager, UserMixin
@@ -20,7 +20,7 @@ import socket
 import os
 
 from cryptography.fernet import Fernet
-from werkzeug.security import generate_password_hash
+#from werkzeug.security import generate_password_hash
 
 def get_ipv4_address():
     # Cria um socket
@@ -42,7 +42,7 @@ def get_ipv4_address():
     
     return ipv4_address
 
-diretory = 'conteudos/3a'
+diretory = 'conteudos\\3a'
 path_db = 'data_3A.sqlite'
 link_server_local = 'http://{get_ipv4_address()}:8000'
 
