@@ -98,7 +98,7 @@ def display(pathname):
                 dbc.Row([
                     html.Div(#id='directorys',
                         list_files.gererate_list_files(diretory+'\\'+user),
-                        style={'width': '120px',  'height': '89vh',
+                        style={'height': '89vh',
                                 'float': 'left',
                                 'margin': '0', 'border': '2px solid #000',
                                 'padding': '5px -10px 5px 5px'}
@@ -127,7 +127,7 @@ def display(pathname):
             #for root, dirs, files in os.walk(diretory+"/"+user):
             #     if file in files:
             #         path = os.path.abspath(os.path.join(root, file))
-            print(path)
+            
             if os.path.exists(path):
                 arq = os.path.abspath(path)
                 #return dash_dangerously_set_inner_html.DangerouslySetInnerHTML(children=read_html_file(arq))
@@ -170,7 +170,6 @@ def abas_(n_clicks, tabs, tabs_html_criated):
     
     if not ctx.triggered:
         raise PreventUpdate
-    print(ctx.triggered[0]['prop_id'])
     
     if 1 in n_clicks:#ctx.triggered:
         clicked_id = json.loads(ctx.triggered[0]['prop_id'].rsplit('.', 1)[0])
@@ -191,6 +190,7 @@ def abas_(n_clicks, tabs, tabs_html_criated):
            
            if file_format in ('html', 'css', 'js'):
                new_tabs = dcc.Tab(
+                    id={'type': 'new-aba', 'index': name_file},
                     label=name_file,
                     className='custom-tab',
                     selected_className='custom-tab--selected',

@@ -42,6 +42,7 @@ def get_ipv4_address():
     
     return ipv4_address
 
+turma = '3A'
 diretory = 'conteudos\\3a'
 path_db = 'data_3A.sqlite'
 link_server_local = 'http://{get_ipv4_address()}:8000'

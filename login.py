@@ -43,7 +43,7 @@ error_style = {
 }
 
 layout = html.Div(className='login', style=div_center_style, children=[
-    html.H2('Tela de Login'),
+    html.H2(f'Tela de Login turma: {turma}'),
     dcc.Input(id='username-input', type='text', placeholder='Usuário', style=input_style),
     dcc.Input(id='password-input', type='password', placeholder='Senha', style=input_style),
     html.Button('Entrar', id='login-button', n_clicks=0, style=button_style),

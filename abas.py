@@ -1,7 +1,8 @@
 import os
 from dash import html, dcc
 import dash_bootstrap_components as dbc
-from dash.dependencies import Input, State, Output
+from dash.dependencies import Input, State, Output, ALL
+from dash.exceptions import PreventUpdate
 #import directories 
 
 from app import *
@@ -50,10 +51,14 @@ layout = html.Div([
     ),
     dbc.Row([
             dbc.Col(
-                dbc.Button('Salvar', id='save', color='success', style=button_style)
+                dbc.Button('Salvar', id='save', style=button_style),
+                style={'display': 'none'},
+                id='salvar-arquivo'
             ),
             dbc.Col(
-                html.A('Abrir Página HTML', id='open-html-link', href='/render', target='_blank', style=a_style)
+                html.A('Abrir Página HTML', id='open-html-link', href='/render', target='_blank', style=a_style),
+                style={'display': 'none'},
+                id='abrir-pagina-html'
             ),
             # dbc.Col(
             #     dbc.Button('Diretorios', id='crie-diretorios-arq', style=button_style)
@@ -76,10 +81,30 @@ layout = html.Div([
                   'flex-direction': 'row',
                   'justify-content': 'left',
                   'padding-left': '10px',
-                  'align-items': 'center'}
+                  'align-items': 'center',
+                  'margin-top': '10px'}
     ), 
     dbc.Row(html.Div(id='teste')),
 ])
+                  
+@app.callback(
+    Output('salvar-arquivo', 'style'),
+    Output('abrir-pagina-html', 'style'),
+    Input('abas', 'value'),
+    State('salvar-arquivo', 'style'),
+    prevent_initial_call=True
+ )
+def ativar_buttons(n_clicks, style):
+    ctx = dash.callback_context
+    
+    if not ctx.triggered:
+        raise PreventUpdate
+        
+    if style['display'] == 'none':
+        return {'display': 'block'}, {'display': 'block'}
+    
+    raise PreventUpdate
+    
 
 @app.callback(
     Output('msg-salvo', 'style'),

@@ -5,7 +5,7 @@ from app import *
 
 directory = os.path.abspath(diretory)
 
-def generate_items(name, path, level):
+def generate_items(name, path, level, max_width):
     if os.path.isdir(path):
         return html.Details([
                     html.Summary(name, style={"cursor": 'pointer'}),
@@ -15,7 +15,7 @@ def generate_items(name, path, level):
                     )
               ], style={'padding-left': '10px'})   
     else:
-        return dbc.NavLink(html.Div(name, className="nav-link-custom", style={'padding-left': '10px'}), id={'type': 'item', 'index': path}, 
+        return dbc.NavLink(html.Div(name, className="nav-link-custom", style={'padding-left': '10px', 'width':f'{max_width}px'}), id={'type': 'item', 'index': path}, 
                        style={'cursor': 'pointer','list-style-type': 'none',
                               'margin-bottom': '2px'})
 
@@ -24,10 +24,15 @@ def gererate_list_files(directory, level=0):
     directory_content.sort(key=lambda x: os.path.isfile(os.path.join(directory, x)))
     
     items = []
+    max_width = 100
     for item in directory_content:
+        if len(item) * 8 > max_width:
+            max_width = len(item) * 8
+            
         full_path = os.path.join(directory, item)
-        items.append(generate_items(item, full_path, level))
-    return items 
+        items.append(generate_items(item, full_path, level, max_width))
+            
+    return items
 
 def generate_items_pdf(name, path, level):
     if os.path.isdir(path):
