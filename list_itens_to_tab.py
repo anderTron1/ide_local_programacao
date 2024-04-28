@@ -103,8 +103,8 @@ def update_output(value, options, user_logado):
     label = [opt['label'] for opt in options if opt['value'] == value][0]
     return [html.Div([
         html.Div([
-            html.Img(src=f'http://{get_ipv4_address()}:8000/{user_logado}/imagens/{label}/{imagem}', style={'width': '100%', 'height': 'auto'}),
-            html.P(f'http://{get_ipv4_address()}:8000/{user_logado}/imagens/{label}/{imagem}',  style={'textAlign': 'center'})
+            html.Img(src=f'http://{get_ipv4_address()}:8080/{user_logado}/imagens/{label}/{imagem}', style={'width': '100%', 'height': 'auto'}),
+            html.P(f'http://{get_ipv4_address()}:8080/{user_logado}/imagens/{label}/{imagem}',  style={'textAlign': 'center'})
         ], style={'textAlign': 'center', 'margin': 'auto', 'width': '50%'})
     ]) for imagem in os.listdir(value)]
 

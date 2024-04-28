@@ -44,7 +44,7 @@ modal = html.Div(dbc.Modal(
 )
 def update_modal_body(is_open):
     if is_open:
-        caminho_atual = 'conteudos/1c/andre'
+        caminho_atual = '/conteudos/1c/andre'
         diretorios = listar_arquivos(caminho_atual)
         links = [
             dbc.NavLink(diretorio, href=f"/{diretorio}", className="nav-link")

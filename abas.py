@@ -3,7 +3,7 @@ from dash import html, dcc
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, State, Output, ALL
 from dash.exceptions import PreventUpdate
-#import directories 
+import directories 
 
 from app import *
 
@@ -46,6 +46,23 @@ a_style = {
 }
 
 layout = html.Div([
+    # dbc.Row(
+    #     html.Nav(
+    #     className="navbar",
+    #     children=[
+    #         html.Div(
+    #             className="nav-item dropdown",
+    #             children=[
+    #                 html.A("MENU", id="menu-link", href="#", style={'text-decoration': 'none'}),
+    #                 html.Div(
+    #                     id="dropdown-menu",
+    #                     className="dropdown-content",
+    #                     style={'background': 'white', 'width': '100px'}
+    #                 )
+    #             ]
+    #         )
+    #     ]), style={'margin-bottom': '25px'}
+    # ),
     dbc.Row( 
         dcc.Tabs(id='abas', parent_className='custom-tabs')   
     ),
@@ -61,7 +78,7 @@ layout = html.Div([
                 id='abrir-pagina-html'
             ),
             # dbc.Col(
-            #     dbc.Button('Diretorios', id='crie-diretorios-arq', style=button_style)
+            #      dbc.Button('Diretorios', id='crie-diretorios-arq', style=button_style)
             # ),
             dbc.Col(
                 html.A('Abrir Imagens', id='open-html-link-imagen', href='/imagens', target='_blank', style=a_style)
@@ -86,6 +103,21 @@ layout = html.Div([
     ), 
     dbc.Row(html.Div(id='teste')),
 ])
+                  
+@app.callback(
+    Output('dropdown-menu', 'children'),
+    [Input('menu-link', 'n_clicks')],
+    prevent_initial_call=True
+)
+def display_dropdown(n_clicks):
+    if n_clicks % 2 == 1:
+        return [
+            html.Li(html.A("Opção 1", href="#", className="dropdown-item")),
+            html.Li(html.A("Opção 2", href="#", className="dropdown-item")),
+            html.Li(html.A("Opção 3", href="#", className="dropdown-item"))
+        ]
+    else:
+        return []
                   
 @app.callback(
     Output('salvar-arquivo', 'style'),
@@ -122,10 +154,11 @@ def display_message(btn_save, n_intervals):
     if n_intervals > 1:
         return {'display': 'none'}  # Oculta a mensagem após 2 segundos
 
-# Callback para abrir o modal
+#Callback para abrir o modal
 # @app.callback(
 #     Output("modal-directory", "is_open"),
-#     [Input("crie-diretorios-arq", "n_clicks"), Input("close-modal", "n_clicks")],
+#     [Input("crie-diretorios-arq", "n_clicks"), 
+#      Input("close-modal", "n_clicks")],
 #     [State("modal-directory", "is_open")],
 # )
 # def toggle_modal(open_clicks, close_clicks, is_open):

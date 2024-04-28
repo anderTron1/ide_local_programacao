@@ -29,12 +29,11 @@ def get_ipv4_address():
     try:
         # Conecta-se a um servidor (neste caso, o Google DNS) para obter o endereço IP
         s.connect(('8.8.8.8', 80))
-        
         # Obtém o endereço IPv4 atribuído ao socket
         ipv4_address = s.getsockname()[0]
     except Exception as e:
         #print("Ocorreu um erro ao obter o endereço IPv4:", e)
-        ipv4_address = None
+        ipv4_address = 'localhost'
         pass
     finally:
         # Fecha o socket
@@ -42,10 +41,10 @@ def get_ipv4_address():
     
     return ipv4_address
 
-turma = '3A'
-diretory = 'conteudos\\3a'
-path_db = 'data_3A.sqlite'
-link_server_local = 'http://{get_ipv4_address()}:8000'
+turma = '1C'
+diretory = 'conteudos\\1C'
+path_db = 'data_1C.sqlite'
+link_server_local = 'http://{get_ipv4_address()}:8080'
 
 key_crypt = Fernet.generate_key()
 cipher_suite = Fernet(key_crypt)
