@@ -1,4 +1,4 @@
 venv/
 conteudos/
-data_1C.sqlite
-data_3A.sqlite
+databases/data_1C.sqlite
+databases/data_3A.sqlite

@@ -18,14 +18,12 @@ import sqlite3
 import socket
 
 import os
-
 from cryptography.fernet import Fernet
 #from werkzeug.security import generate_password_hash
 
 def get_ipv4_address():
     # Cria um socket
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    
     try:
         # Conecta-se a um servidor (neste caso, o Google DNS) para obter o endereço IP
         s.connect(('8.8.8.8', 80))
@@ -38,12 +36,12 @@ def get_ipv4_address():
     finally:
         # Fecha o socket
         s.close()
-    
     return ipv4_address
 
-turma = '1C'
-diretory = 'conteudos\\1C'
-path_db = 'data_1C.sqlite'
+#Configurações de execução para uma turma especifica
+turma = '2B'
+diretory = 'conteudos\\2B'
+path_db = 'databases\\data_2B.sqlite'
 link_server_local = 'http://{get_ipv4_address()}:8080'
 
 key_crypt = Fernet.generate_key()
@@ -63,17 +61,12 @@ class Users(db.Model, UserMixin):
 Users_table = Table('users', Users.metadata)  
 
   
-#def create_users_table():
-#    Users.metadata.create_all(engine)
-
-#create_users_table()
-
 # Inicializa o SQLAlchemy com o aplicativo Flask
 def init_app(app):
     db.init_app(app)
 
-estilos = ["https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css", dbc.themes.DARKLY]
-dbc_css = "https://kit.fontawesome.com/a076d05399.js" 
+#estilos = ["https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css", dbc.themes.DARKLY]
+#dbc_css = "https://kit.fontawesome.com/a076d05399.js" 
 
 app = dash.Dash(__name__)#, external_scripts=['http://localhost:8000'])#,external_stylesheets=[dbc.themes.BOOTSTRAP])# external_stylesheets=[dbc.themes.DARKLY])#estilos)
 
@@ -94,10 +87,3 @@ db.init_app(server)
 
 Session = sessionmaker(bind=engine)
 session = Session()
-
-# hashed_password = generate_password_hash('@Ndertron123', method='pbkdf2:sha256')
-# ins = Users_table.insert().values(username='admin', password=hashed_password)
-# conn = engine.connect()
-# conn.execute(ins)
-# conn.commit()
-# conn.close()
