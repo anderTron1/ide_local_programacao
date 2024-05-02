@@ -39,9 +39,9 @@ def get_ipv4_address():
     return ipv4_address
 
 #Configurações de execução para uma turma especifica
-turma = '2B'
-diretory = 'conteudos\\2B'
-path_db = 'databases\\data_2B.sqlite'
+turma = '1C'
+diretory = 'conteudos\\1c'
+path_db = 'databases\\data_1C.sqlite'
 link_server_local = 'http://{get_ipv4_address()}:8080'
 
 key_crypt = Fernet.generate_key()
@@ -60,7 +60,7 @@ class Users(db.Model, UserMixin):
     
 Users_table = Table('users', Users.metadata)  
 
-  
+
 # Inicializa o SQLAlchemy com o aplicativo Flask
 def init_app(app):
     db.init_app(app)
@@ -68,7 +68,7 @@ def init_app(app):
 #estilos = ["https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css", dbc.themes.DARKLY]
 #dbc_css = "https://kit.fontawesome.com/a076d05399.js" 
 
-app = dash.Dash(__name__)#, external_scripts=['http://localhost:8000'])#,external_stylesheets=[dbc.themes.BOOTSTRAP])# external_stylesheets=[dbc.themes.DARKLY])#estilos)
+app = dash.Dash(__name__)#, external_scripts=['asset'])#,external_stylesheets=[dbc.themes.BOOTSTRAP])# external_stylesheets=[dbc.themes.DARKLY])#estilos)
 
 app.config['suppress_callback_exceptions'] = True
 app.scripts.config.serve_locally = True

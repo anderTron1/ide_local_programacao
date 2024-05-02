@@ -215,10 +215,12 @@ def abas_(n_clicks, tabs, tabs_html_criated):
                                          mode='html',
                                          tabSize=2,
                                          height='75vh',
+                                         className='editor',
                                          width='60wh',
                                          enableBasicAutocompletion=True,
                                          enableLiveAutocompletion=True,
-                                         autocompleter="/autocompleter?prefix=")
+                                         autocompleter="/autocompleter?prefix="
+                                         )
                         ])
                 ])
                tabs.append(new_tabs)
@@ -230,6 +232,8 @@ def abas_(n_clicks, tabs, tabs_html_criated):
         else:
             raise PreventUpdate 
     raise PreventUpdate
+    
+
 
 @app.callback(
     Output('msg-salvo', 'children'),
