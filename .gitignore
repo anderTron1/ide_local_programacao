@@ -1,5 +1,5 @@
 venv/
+databases/*.sqlite
 conteudos/*.*
 conteudos/*/
 !conteudos/apoio/*/
-databases/*.*
