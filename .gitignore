@@ -3,3 +3,4 @@ databases/*.sqlite
 conteudos/*.*
 conteudos/*/
 !conteudos/apoio/*/
+ 
