@@ -2,4 +2,4 @@ venv/
 conteudos/*.*
 conteudos/*/
 !conteudos/apoio/*/
-databases/*/
+databases/*.*
