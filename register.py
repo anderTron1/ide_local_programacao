@@ -162,7 +162,7 @@ def update_table_data(pathname):
         #conn1.close()
         
         #conn1 = sqlite3.connect(f'{path_db}')
-        turmas = pd.read_sql("SELECT id, turma FROM turmas", conn1)
+        turmas = pd.read_sql("SELECT id, turma FROM turmas ORDER BY id", conn1)
         conn1.close()
         
         #return df.to_dict('records'),
@@ -180,7 +180,7 @@ def update_table_user(selected_rows, pathname, df_turma):
     if selected_rows != None and selected_rows != []:
        id = df_turma[selected_rows[0]]['id']
        conn1 = sqlite3.connect(path_db)
-       df = pd.read_sql(f"SELECT id, username, turma_id FROM users WHERE (turma_id={int(id)} OR username='admin')", conn1)
+       df = pd.read_sql(f"SELECT id, username, turma_id FROM users WHERE (turma_id={int(id)} OR username='admin') ORDER BY username", conn1)
        conn1.close()
        
        return df.to_dict('records')
@@ -230,37 +230,49 @@ def edit_turma(selected_rows, registers):
 def register(n_clicks_register, n_clicks_delete, username, password, selected_rows, registers, select_id_turma, select_turma):
     if n_clicks_register:
         if username is not None and username is not ""  and password is not None and password is not "":
-            if selected_rows == []:
+            if selected_rows == [] and select_id_turma is not None:
+                turma = [item["label"] for item in select_turma if item["value"] == select_id_turma]
+                if os.path.exists(diretory+'\\'+turma[0]+'\\'+username.upper()):
+                    return 'user-exist'
                 hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
-                
+                    
                 username = username.upper()
                 ins = Users_table.insert().values(username=username, password=hashed_password, turma_id=select_id_turma)
                 conn = engine.connect()
-        
+            
                 conn.execute(ins)
                 conn.commit()
                 conn.close()
-                
-                turma = [item["label"] for item in select_turma if item["value"] == select_id_turma]
+                    
                 if os.path.exists(diretory+'\\'+turma[0]):
                     direct = diretory+'\\'+turma[0]
                     os.makedirs(f"{os.path.abspath(direct)}\\{username}\\imagens")
                 return 'user-save'
             else:
+                if select_id_turma == None and username != 'admin':
+                    return "error"
+                
                 id_edit = int(registers[selected_rows[0]]['id'])
                 user_to_update = session.query(Users).filter_by(id=id_edit).first() 
+                    
+                hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
                 
                 if user_to_update.username == "admin":
                     if username != user_to_update.username:
                         return "error-admin"
-                    
-                hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
-                
+                elif user_to_update.username != username:
+                    turma = [item["label"] for item in select_turma if item["value"] == select_id_turma]
+                    try:
+                        path = diretory+'\\'+turma[0]+'\\'
+                        if os.path.exists(path+user_to_update.username):
+                            os.rename(path+user_to_update.username, path+username)
+                    except OSError as e:
+                        return 'error-rename-direct'
                 user_to_update.username = username
                 user_to_update.password = hashed_password
                 
-                if user_to_update.username != "admin":
-                    user_to_update.turma_id = select_id_turma
+                # if user_to_update.username != "admin":
+                #     user_to_update.turma_id = select_id_turma
                 
                 session.commit()
                 
@@ -345,6 +357,10 @@ def status_login(status):
         return "Usuário deletado!"
     elif status == "error-deleted":
         return "Usuário administrador não pode ser deletado"
+    elif status == "user-exist":
+        return "O usuário já existe!"
+    elif status == "error-rename-direct":
+        return "Erro ao modificar o nome do diretorio"
     else:
         return status, "Usuário alterado!"
 
