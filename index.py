@@ -30,10 +30,12 @@ login_manager.login_view = '/login'
 app.layout = dbc.Container(id='container', children=[
     dcc.Store(id="tabs-html"),
     dcc.Store(id="user-logado"),
+    #dcc.Store(id="table-selected"),
     dcc.Store(id='store-login-status'),
     dcc.Location('url'),
     dcc.Store(id='rotas-url', data='/'),
     dcc.Store(id='register-state'),
+    dcc.Store(id="register-class-state"),
     html.Div(id='content')
 ], style={"margin": '5px'})
 
@@ -70,9 +72,10 @@ def iniciar(rotas):
 
 @login_manager.user_loader
 def load_user(user_id):
+    #return User(user_id)#
     return session.query(Users).get(int(user_id))
 
-@app.callback(
+@app.callback( 
     Output('content', 'children'),
     Output('user-logado', 'data'),
     Input('url', 'pathname'),
@@ -90,6 +93,12 @@ def display(pathname):
         user = ""
         if current_user.is_authenticated:
             user = current_user.username
+            
+            conn1 = sqlite3.connect(path_db)
+            df = pd.read_sql(f"SELECT turma FROM turmas WHERE id = {int(current_user.turma_id)}", conn1)
+            turma = df['turma'].values[0]
+            conn1.close()
+            
             layout = [
                 #list_files.layout,
                 dbc.Row([
@@ -97,7 +106,7 @@ def display(pathname):
                 ], style={"margin-bottom": '5px'}),
                 dbc.Row([
                     html.Div(#id='directorys',
-                        list_files.gererate_list_files(diretory+'\\'+user),
+                        list_files.gererate_list_files(diretory+'\\'+turma+'\\'+user),
                         style={'height': '89vh',
                                 'float': 'left',
                                 'margin': '0', 'border': '2px solid #000',
@@ -113,6 +122,7 @@ def display(pathname):
         return layout, user
     if pathname == '/register':
         if current_user.is_authenticated and current_user.username == 'admin':
+        #if current_user.username == 'admin':
             return register.render_layout(""), ""
         else:
             return [login.layout], ""
@@ -137,9 +147,15 @@ def display(pathname):
             
     if pathname == '/imagens':
         if current_user.is_authenticated:
+            
+            conn1 = sqlite3.connect(path_db)
+            df = pd.read_sql(f"SELECT turma FROM turmas WHERE id = {int(current_user.turma_id)}", conn1)
+            turma = df['turma'].values[0]
+            conn1.close()
+            
             user = current_user.username
             return html.Div([
-                list_itens_to_tab.criar_grade_imagens(diretory+'/'+user+'/imagens')
+                list_itens_to_tab.criar_grade_imagens(diretory+'/'+turma+'/'+user+'/imagens')
             ]), user
         else:
             return [login.layout], ""

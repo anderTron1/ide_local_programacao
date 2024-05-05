@@ -9,13 +9,14 @@ Created on Tue Mar 26 22:37:49 2024
 import dash 
 import dash_bootstrap_components as dbc
 
-from sqlalchemy import Table, create_engine
+from sqlalchemy import Table, create_engine, MetaData
 #from sqlalchemy.sql import select
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import sessionmaker
 from flask_login import LoginManager, UserMixin
 import sqlite3
 import socket
+import pandas as pd
 
 import os
 from cryptography.fernet import Fernet
@@ -39,26 +40,41 @@ def get_ipv4_address():
     return ipv4_address
 
 #Configurações de execução para uma turma especifica
-turma = '1C'
-diretory = 'conteudos\\1c'
-path_db = 'databases\\data_1C.sqlite'
+turma = '3A'
+diretory = 'conteudos'#'\\3a'
+path_db = 'databases\\users.sqlite'
 link_server_local = 'http://{get_ipv4_address()}:8080'
 
-key_crypt = Fernet.generate_key()
+key_crypt = Fernet.generate_key();
 cipher_suite = Fernet(key_crypt)
    
 conn = sqlite3.connect(f'{path_db}')
 engine = create_engine(f'sqlite:///{path_db}')
+
+
 db = SQLAlchemy()
 
- 
+# class Users(db.Model, UserMixin):
+#     id = db.Column(db.Integer, primary_key=True)
+#     username = db.Column(db.String(20), unique=True, nullable=False)
+#     password = db.Column(db.String(180))
+
+class Turmas(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    turma = db.Column(db.String(100), unique=True, nullable=False)
+    descricao = db.Column(db.String(255))
+
 class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
-    #email = db.Column(db.String(60), unique=True)
-    password = db.Column(db.String(180))
+    password = db.Column(db.String(180), nullable=False)
     
-Users_table = Table('users', Users.metadata)  
+    turma_id = db.Column(db.Integer, db.ForeignKey('turmas.id'))
+    # Relacionamento com a tabela Turmas
+    turma = db.relationship('Turmas', backref=db.backref('users', lazy=True))    
+
+turma_table = Table('turmas', Turmas.metadata)
+Users_table = Table('users', Users.metadata)   
 
 
 # Inicializa o SQLAlchemy com o aplicativo Flask
