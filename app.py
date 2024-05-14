@@ -40,7 +40,7 @@ def get_ipv4_address():
     return ipv4_address
 
 #Configurações de execução para uma turma especifica
-turma = '3A'
+#turma = '3A'
 diretory = 'conteudos'#'\\3a'
 path_db = 'databases\\users.sqlite'
 link_server_local = 'http://{get_ipv4_address()}:8080'

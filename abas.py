@@ -122,6 +122,7 @@ def display_dropdown(n_clicks):
 @app.callback(
     Output('salvar-arquivo', 'style'),
     Output('abrir-pagina-html', 'style'),
+    Output('my-color-picker-1', 'style'),
     Input('abas', 'value'),
     State('salvar-arquivo', 'style'),
     prevent_initial_call=True
@@ -133,7 +134,7 @@ def ativar_buttons(n_clicks, style):
         raise PreventUpdate
         
     if style['display'] == 'none':
-        return {'display': 'block'}, {'display': 'block'}
+        return {'display': 'block'}, {'display': 'block'}, {'display': 'block'}
     
     raise PreventUpdate
     

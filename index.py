@@ -6,6 +6,8 @@ from dash.exceptions import PreventUpdate
 #from dash_html_components import Iframe
 #import dash_dangerously_set_inner_html
 
+import dash_daq as daq
+
 import os
 import json 
 #import re 
@@ -30,7 +32,6 @@ login_manager.login_view = '/login'
 app.layout = dbc.Container(id='container', children=[
     dcc.Store(id="tabs-html"),
     dcc.Store(id="user-logado"),
-    #dcc.Store(id="table-selected"),
     dcc.Store(id='store-login-status'),
     dcc.Location('url'),
     dcc.Store(id='rotas-url', data='/'),
@@ -72,15 +73,12 @@ def iniciar(rotas):
 
 @login_manager.user_loader
 def load_user(user_id):
-    #return User(user_id)#
     return session.query(Users).get(int(user_id))
 
 @app.callback( 
     Output('content', 'children'),
     Output('user-logado', 'data'),
     Input('url', 'pathname'),
-    #State('directory', 'data'),
-    #[State('tab-selected', 'data')]
 )
 def display(pathname):
     
@@ -104,18 +102,27 @@ def display(pathname):
                 dbc.Row([
                     html.Label(f'Nome do usuário: {current_user.username}')
                 ], style={"margin-bottom": '5px'}),
-                dbc.Row([
+                dbc.Row(children=[
+                    dbc.Col(
                     html.Div(#id='directorys',
                         list_files.gererate_list_files(diretory+'\\'+turma+'\\'+user),
                         style={'height': '89vh',
                                 'float': 'left',
                                 'margin': '0', 'border': '2px solid #000',
                                 'padding': '5px -10px 5px 5px'}
+                    )),
+                    dbc.Col(
+                    abas.layout, style={"width": "80%"}
                     ),
-                    abas.layout
-                ]),
-                
-                #directories.modal
+                    dbc.Col(
+                        daq.ColorPicker(
+                            id='my-color-picker-1',
+                            label='Paleta de cores',
+                            value=dict(hex='#119DFF'),
+                            style= {'display': 'none'}
+                        )
+                    )
+                ], style={'display': 'flex'}),
             ]
         else:
             layout = [login.layout]
@@ -232,7 +239,7 @@ def abas_(n_clicks, tabs, tabs_html_criated):
                                          tabSize=2,
                                          height='75vh',
                                          className='editor',
-                                         width='60wh',
+                                         width='40wh',
                                          enableBasicAutocompletion=True,
                                          enableLiveAutocompletion=True,
                                          autocompleter="/autocompleter?prefix="

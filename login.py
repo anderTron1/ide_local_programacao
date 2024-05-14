@@ -126,8 +126,11 @@ def check_login(n_clicks, username, password, tabled_id, tabled_selected):
                    dir_path = username
             
         with app.server.app_context():
-            user = session.query(Users).filter_by(username=username).first()
-            
+            if username != "admin":
+                user = session.query(Users).filter_by(username=username, turma_id=tabled_id).first()
+            else:
+                user = session.query(Users).filter_by(username=username).first()
+                
             if user is not None and password is not None:
                 if check_password_hash(user.password, password):
                     login_user(user)
